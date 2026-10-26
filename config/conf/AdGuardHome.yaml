@@ -1,0 +1,127 @@
+# OpenAccess DNS — AdGuard Home preset configuration
+# Pre-configured for bypass-friendly upstreams and minimal blocking of popular services.
+# Edit after first run via web UI (http://YOUR_IP:3000)
+
+bind_host: 0.0.0.0
+bind_port: 3000
+users:
+  - name: admin
+    # Default password: openaccess  (change immediately!)
+    # Generated with: htpasswd -B -C 10 -n admin
+    password: $2y$10$8K1p/a0dL1LXMIgoEDFrwOfMQbTjqzqKzqzqzqzqzqzqzqzqzqzq  # placeholder — set via UI
+http:
+  address: 0.0.0.0:3000
+  session_ttl: 720h
+dns:
+  bind_hosts:
+    - 0.0.0.0
+  port: 53
+  anonymize_client_ip: false
+  ratelimit: 0
+  ratelimit_subnet_len_ipv4: 24
+  ratelimit_subnet_len_ipv6: 56
+  refuse_any: true
+  upstream_dns:
+    # Fast & reliable upstreams (Cloudflare + Google + Quad9)
+    - https://1.1.1.1/dns-query
+    - https://1.0.0.1/dns-query
+    - https://8.8.8.8/dns-query
+    - https://8.8.4.4/dns-query
+    - https://9.9.9.9/dns-query
+    - tls://1.1.1.1
+    - tls://8.8.8.8
+  bootstrap_dns:
+    - 1.1.1.1
+    - 8.8.8.8
+    - 9.9.9.9
+  fallback_dns:
+    - 1.1.1.1
+    - 8.8.8.8
+  upstream_mode: parallel
+  fastest_timeout: 1s
+  cache_size: 67108864
+  cache_ttl_min: 0
+  cache_ttl_max: 0
+  cache_optimistic: true
+  # Enable DNSSEC if desired
+  enable_dnssec: false
+  # DoH / DoT
+  tls:
+    enabled: false
+    # After you have a domain + cert, enable and point to your certs
+    # server_name: dns.yourdomain.com
+    # force_https: false
+    # port_https: 443
+    # port_dns_over_tls: 853
+    # certificate_path: /opt/adguardhome/conf/cert.pem
+    # private_key_path: /opt/adguardhome/conf/key.pem
+  # Filtering — keep light for "unblock" use-case
+  filtering_enabled: true
+  filters_update_interval: 24
+  parental_enabled: false
+  safebrowsing_enabled: false
+  safesearch_enabled: false
+  # Custom rules for popular services (allowlist style)
+  # AdGuard Home uses AdBlock syntax. These are examples to keep YouTube/Telegram reachable.
+  user_rules:
+    - "@@||youtube.com^"
+    - "@@||youtu.be^"
+    - "@@||googlevideo.com^"
+    - "@@||ytimg.com^"
+    - "@@||telegram.org^"
+    - "@@||t.me^"
+    - "@@||telegram.me^"
+    - "@@||core.telegram.org^"
+    - "@@||web.telegram.org^"
+    - "@@||discord.com^"
+    - "@@||discord.gg^"
+    - "@@||discordapp.com^"
+    - "@@||twitter.com^"
+    - "@@||x.com^"
+    - "@@||twimg.com^"
+    - "@@||instagram.com^"
+    - "@@||cdninstagram.com^"
+    - "@@||facebook.com^"
+    - "@@||fbcdn.net^"
+  # Optional blocklists (malicious domains only — keep internet free)
+  filters:
+    - enabled: true
+      url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
+      name: AdGuard DNS filter
+      id: 1
+    - enabled: true
+      url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_59.txt
+      name: AdGuard Malware filter
+      id: 59
+querylog:
+  enabled: true
+  file_enabled: true
+  interval: 24h
+  size_memory: 1000
+  ignored: []
+statistics:
+  enabled: true
+  interval: 24h
+  ignored: []
+dhcp:
+  enabled: false
+clients:
+  runtime_sources:
+    whois: true
+    arp: true
+    rdns: true
+    dhcp: true
+    hosts: true
+log:
+  file: ""
+  max_backups: 0
+  max_size: 100
+  max_age: 3
+  compress: false
+  local_time: false
+  verbose: false
+os:
+  group: ""
+  user: ""
+  rlimit_nofile: 0
+schema_version: 28
