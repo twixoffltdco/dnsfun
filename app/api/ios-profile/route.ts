@@ -1,24 +1,24 @@
 import { NextResponse } from "next/server";
-import { DNS_CONFIG } from "@/lib/dns-config";
+import { DNS_CONFIG, OUR_DOH_URL, DOT_HOSTNAME } from "@/lib/dns-config";
 
 /**
  * Генерирует Apple Configuration Profile (.mobileconfig) с DoH/DoT.
  *
+ * Используются ТОЛЬКО наши собственные эндпоинты (см. lib/server-config.ts).
+ *
  * Env:
- *   NEXT_PUBLIC_DOH_URL  — ваш DoH endpoint (по умолчанию рабочий публичный preset)
- *   NEXT_PUBLIC_DOT_HOST — ваш DoT hostname
+ *   NEXT_PUBLIC_DOH_URL  — наш DoH endpoint
+ *   NEXT_PUBLIC_DOT_HOST — наш DoT hostname
  */
 export async function GET() {
   const payloadUUID = crypto.randomUUID().toUpperCase();
   const profileUUID = crypto.randomUUID().toUpperCase();
   const dohUUID = crypto.randomUUID().toUpperCase();
 
-  // Свой сервер после деплоя, иначе — проверенный рабочий fallback,
-  // чтобы профиль был функциональным «из коробки».
-  const dohUrl =
-    process.env.NEXT_PUBLIC_DOH_URL || DNS_CONFIG.doh.browserPreset;
-  const dotHost =
-    process.env.NEXT_PUBLIC_DOT_HOST || DNS_CONFIG.dot.fallbacks[0];
+  // Свой сервер после деплоя. Клиентам НЕ отдаём сторонние резолверы
+  // (AdGuard Public DNS и т.п.) — только наши собственные эндпоинты.
+  const dohUrl = OUR_DOH_URL;
+  const dotHost = DOT_HOSTNAME;
   const serverName = DNS_CONFIG.name;
 
   const mobileconfig = `<?xml version="1.0" encoding="UTF-8"?>

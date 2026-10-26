@@ -36,14 +36,21 @@
 ## 🚀 Как использовать публичный DNS
 
 1. Откройте [лендинг](#) (после деплоя Next.js)
-2. Скопируйте нужный адрес:
-   - **Обычный DNS**: `94.140.14.14` / `2a10:50c0::1:ff` (пример)
-   - **DoH**: `https://dns.example/dns-query`
-   - **DoT**: `dns.example`
+2. Скопируйте нужный адрес — все они ведут на **наш** сервер:
+   - **Обычный DNS**: IP нашего резолвера (порт 53)
+   - **DoH**: `https://dns.openaccess.example/dns-query` (наш эндпоинт)
+   - **DoT**: `dns.openaccess.example` (наш сервер, порт 853)
 3. Для iOS — нажмите «Скачать профиль»
 4. Для Android — Settings → Network → Private DNS → введите hostname
 
-> Адреса в `lib/dns-config.ts` — замените на свои после развёртывания.
+> Сторонние публичные DNS (AdGuard Public DNS, Cloudflare, Google) клиентам
+> **не выдаются** — обход блокировок РКН идёт через наш резолвер, который сам
+> ходит в зашифрованные upstream'ы (DoH/DoT).
+>
+> Свои адреса задаются в одном месте — `lib/server-config.ts`
+> (`SERVER_HOSTNAME`, `SERVER_IPV4`, `SERVER_IPV6`). После деплоя замените их
+> на реальные значения вашего VPS, либо переопределите через переменные
+> окружения `NEXT_PUBLIC_DOH_URL` / `NEXT_PUBLIC_DOT_HOST`.
 
 ---
 

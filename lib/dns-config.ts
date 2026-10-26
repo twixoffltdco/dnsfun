@@ -1,38 +1,51 @@
 /**
  * Public DNS endpoints configuration.
- * Замените домен/IP на свой после деплоя (см. docker-compose.yml + dns/resolver.py).
- * POC-значения ниже — реальные рабочие публичные bypass-эндпоинты,
- * лендинг работает «из коробки» до установки собственного сервера.
+ *
+ * ВАЖНО: здесь указаны ТОЛЬКО НАШИ собственные эндпоинты (наш сервер из
+ * docker-compose.yml + dns/resolver.py). Сторонние резолверы (AdGuard Public
+ * DNS, Cloudflare, Google) клиентам НЕ отдаются — обход блокировок РКН идёт
+ * через наш резолвер, который сам ходит в зашифрованные upstream'ы.
+ *
+ * После деплоя своего сервера замените hostname/IP в lib/server-config.ts
+ * (или задайте NEXT_PUBLIC_* переменные окружения) — все карточки лендинга,
+ * Android-инструкция и iOS-профиль подхватят наши адреса автоматически.
  */
+import {
+  SERVER_HOSTNAME,
+  DOH_URL,
+  SERVER_IPV4,
+  SERVER_IPV6,
+} from "./server-config";
+
+/** Наш собственный DoT/DoH hostname (можно переопределить через env). */
+export const DOT_HOSTNAME =
+  process.env.NEXT_PUBLIC_DOT_HOST || SERVER_HOSTNAME;
+
+/** Наш собственный DoH endpoint (можно переопределить через env). */
+export const OUR_DOH_URL =
+  process.env.NEXT_PUBLIC_DOH_URL || DOH_URL;
+
 export const DNS_CONFIG = {
-  // Plain DNS (наш резолвер: dns/resolver.py слушает :53)
+  // Plain DNS — наш резолвер (dns/resolver.py слушает :53 на нашем сервере)
   plain: {
-    ipv4: "94.140.14.14",
-    ipv6: "2a10:50c0::1:ff",
-    // Secondary
-    ipv4_secondary: "94.140.15.15",
-    ipv6_secondary: "2a10:50c0::2:ff",
+    ipv4: SERVER_IPV4,
+    ipv6: SERVER_IPV6,
   },
-  // DNS-over-HTTPS (dns/doh_server.py за Caddy/nginx, RFC 8484 wire-format)
+  // DNS-over-HTTPS — ТОЛЬКО наш эндпоинт (dns/doh_server.py за TLS-терминатором)
   doh: {
-    url: "https://dns.openaccess.example/dns-query",
-    // Проверенные бесплатные DoH для обхода — работают прямо сейчас:
-    fallbacks: [
-      "https://dns.adguard-dns.com/dns-query",
-      "https://cloudflare-dns.com/dns-query",
-      "https://dns.google/dns-query",
-    ] as readonly string[],
-    // Публичный браузерный preset (chrome://settings — «Настраиваемый»)
-    browserPreset: "https://dns.adguard-dns.com/dns-query",
+    url: OUR_DOH_URL,
+    // Публичный браузерный preset (chrome://settings — «Настраиваемый») — наш сервер
+    browserPreset: OUR_DOH_URL,
   },
-  // DNS-over-TLS (порт 853)
+  // DNS-over-TLS — наш сервер (порт 853)
   dot: {
-    hostname: "dns.openaccess.example",
+    hostname: DOT_HOSTNAME,
     port: 853,
-    fallbacks: ["dns.adguard-dns.com", "security.cloudflare-dns.com", "dns.google"],
+    // Единственный DoT-хост — наш собственный
+    fallbacks: [DOT_HOSTNAME] as readonly string[],
   },
-  // Android Private DNS hostname (работает из коробки до своего сервера)
-  androidPrivateDns: "dns.adguard-dns.com",
+  // Android Private DNS hostname — наш сервер
+  androidPrivateDns: DOT_HOSTNAME,
   // Display names
   name: "OpenAccess DNS",
 } as const;
