@@ -1,6 +1,23 @@
 version: "3.8"
 
 services:
+  # Собственный bypass-резолвер (DoH/DoT upstreams + anti-poisoning + ECH)
+  openaccess-resolver:
+    image: python:3.12-alpine
+    container_name: openaccess-resolver
+    restart: unless-stopped
+    volumes:
+      - ./dns:/app/dns:ro
+    command: >
+      sh -c "python3 /app/dns/resolver.py --listen 0.0.0.0 --port 53 &
+             python3 /app/dns/doh_server.py --listen 0.0.0.0 --port 8053"
+    ports:
+      - "5353:53/tcp"   # plain DNS без root-привилегий хоста (тест)
+      - "5353:53/udp"
+      - "8053:8053/tcp" # DoH endpoint (за Caddy/nginx с TLS)
+    networks:
+      - dnsnet
+
   adguardhome:
     image: adguard/adguardhome:latest
     container_name: openaccess-dns

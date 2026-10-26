@@ -1,6 +1,7 @@
 "use client";
 
 import { Smartphone, Download } from "lucide-react";
+import { DNS_CONFIG } from "@/lib/dns-config";
 
 export function MobileSection() {
   return (
@@ -67,7 +68,7 @@ export function MobileSection() {
             </p>
 
             <div className="code-block mb-4 rounded-xl px-4 py-3 text-sm text-neon-cyan">
-              dns.openaccess.example
+              {DNS_CONFIG.androidPrivateDns}
             </div>
 
             <ol className="space-y-2 text-sm text-white/50">

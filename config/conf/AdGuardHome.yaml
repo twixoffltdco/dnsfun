@@ -6,9 +6,9 @@ bind_host: 0.0.0.0
 bind_port: 3000
 users:
   - name: admin
-    # Default password: openaccess  (change immediately!)
-    # Generated with: htpasswd -B -C 10 -n admin
-    password: $2y$10$8K1p/a0dL1LXMIgoEDFrwOfMQbTjqzqKzqzqzqzqzqzqzqzqzqzq  # placeholder — set via UI
+    # Default password: openaccess  (CHANGE IMMEDIATELY after first login!)
+    # Real bcrypt hash of "openaccess" (Go x/crypto/bcrypt accepts $2b$)
+    password: $2b$10$RSB4TsrwqYRcQgYf32wC3OoC5cGrDmJiHTzniqCXTcId2zfNdmucm
 http:
   address: 0.0.0.0:3000
   session_ttl: 720h
